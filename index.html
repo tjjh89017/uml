@@ -46,19 +46,16 @@
 		var rect2 = rect.clone();
 		rect2.translate(300);
 
-		var link = new joint.dia.Link({
-			source: { id: rect.id },
-			target: { id: rect2.id }
-		});
-
 		$('#create-class').click(function(event){
 			console.log('create-class onclick');
+			paper.off('cell:pointerdown');
+
 			paper.on('blank:pointerclick', function(event, x1, y1){
-				graph.addCells([new joint.shapes.basic.Rect({
+				graph.addCell(new joint.shapes.basic.Rect({
 					position: {x: x1, y: y1},
 					size: {width: 100, height: 30},
 					attrs: {rect: {fill: 'blue'}, text: {text: 'mybox', fill: 'white'}}
-				})]);
+				}));
 			});
 			$('button').attr('disabled', false);
 			$('#create-class').attr('disabled', true)
@@ -107,7 +104,7 @@
 
 					console.log(cellView);
 					cellView2 = paper.findViewsFromPoint({x: x, y: y})[0];
-					if(cellView2){
+					if(cellView2 && cellView != cellView2){
 						var link = new joint.dia.Link({
 							source: { id: cellView.model.id },
 							target: { id: cellView2.model.id }
@@ -145,13 +142,15 @@
 
 					console.log(cellView);
 					cellView2 = paper.findViewsFromPoint({x: x, y: y})[0];
-					var link = new joint.dia.Link({
-						source: { id: cellView.model.id },
-						target: { id: cellView2.model.id }
-					});
+					if(cellView2 && cellView != cellView2){
+						var link = new joint.dia.Link({
+							source: { id: cellView.model.id },
+							target: { id: cellView2.model.id }
+						});
 					
 
-					graph.addCell(link);
+						graph.addCell(link);
+					}
 				});
 			});
 		});

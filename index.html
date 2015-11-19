@@ -107,17 +107,19 @@
 
 					console.log(cellView);
 					cellView2 = paper.findViewsFromPoint({x: x, y: y})[0];
-					var link = new joint.dia.Link({
-						source: { id: cellView.model.id },
-						target: { id: cellView2.model.id }
-					});
-					link.attr({
-						'.marker-target': {
-							fill: 'red', d: 'M 10 0 L 0 5 L 10 10 z'
-						}
-					});
+					if(cellView2){
+						var link = new joint.dia.Link({
+							source: { id: cellView.model.id },
+							target: { id: cellView2.model.id }
+						});
+						link.attr({
+							'.marker-target': {
+								fill: 'red', d: 'M 10 0 L 0 5 L 10 10 z'
+							}
+						});
 
-					graph.addCell(link);
+						graph.addCell(link);
+					}
 				});
 			});
 		});

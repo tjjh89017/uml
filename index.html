@@ -5,6 +5,7 @@
 	<script src="lodash.min.js"></script>
 	<script src="backbone-min.js"></script>
 	<script src="joint.js"></script>
+	<script src="joint.shapes.devs.js"></script>
 </head>
 
 <body>
@@ -12,8 +13,8 @@
 	<div id="select-menu">
 		<button id='select' class='button' disabled>Select</button>
 		<button id='create-class' class='button'>Create Class</button>
-		<button class='button'>c</button>
-		<button class='button'>d</button>
+		<button id='ass_line' class='button'>association line</button>
+		<button id='gen_line' class='button'>generalization line</button>
 		<button class='button'>e</button>
 
 	</div>
@@ -53,7 +54,6 @@
 		$('#create-class').click(function(event){
 			console.log('create-class onclick');
 			paper.on('blank:pointerclick', function(event, x1, y1){
-				//paper.off('blank:pointerclick');
 				graph.addCells([new joint.shapes.basic.Rect({
 					position: {x: x1, y: y1},
 					size: {width: 100, height: 30},
@@ -67,23 +67,97 @@
 		$('#select').click(function(event){
 			console.log('select onclick');
 			paper.off('blank:pointerclick');
+			paper.off('cell:pointerdown');
 			$('button').attr('disabled', false);
 			$('#select').attr('disabled', true);
+
+			paper.on('cell:pointerclick', function(cellView, event, x, y){
+				if(cellView.$el.attr('class').indexOf('highlighted') > -1){
+					cellView.unhighlight();
+				}
+				else{
+					graph.get('cells').forEach(function(cell){
+						paper.findViewByModel(cell).unhighlight();
+					});
+					cellView.highlight();
+				}
+				console.log(cellView);
+				console.log(cellView.$el.attr('class'));
+			});
 		});
 
-		paper.on('cell:pointerclick', function(cellView, event, x, y){
-			
-			if(cellView.$el.attr('class').indexOf('highlighted') > -1){
-				cellView.unhighlight();
-			}
-			else{
-				cellView.highlight();
-			}
-			console.log(cellView);
-			console.log(cellView.$el.attr('class'));
+		$('#ass_line').click(function(event){
+			console.log('ass_line onclick');
+			paper.off('blank:pointerclick');
+			paper.off('cell:pointerdown');
+			$('button').attr('disabled', false);
+			$('#ass_line').attr('disabled', true);
+
+			paper.off('cell:pointerclick');
+			paper.on('cell:pointerdown', function(cellView, event, x, y){
+				console.log('cell:pointerdown');
+				cellView.options.interactive = false;
+
+				paper.on('cell:pointerup', function(cellView2, event, x, y){
+					paper.off('cell:pointerup');
+					//paper.off('cell:pointerdown');
+
+					console.log('cell:pointerup');
+					cellView.options.interactive = true;
+
+					console.log(cellView);
+					cellView2 = paper.findViewsFromPoint({x: x, y: y})[0];
+					var link = new joint.dia.Link({
+						source: { id: cellView.model.id },
+						target: { id: cellView2.model.id }
+					});
+					link.attr({
+						'.marker-target': {
+							fill: 'red', d: 'M 10 0 L 0 5 L 10 10 z'
+						}
+					});
+
+					graph.addCell(link);
+				});
+			});
 		});
 
-		graph.addCells([rect, rect2, link]);
+		$('#gen_line').click(function(event){
+			console.log('ass_line onclick');
+			paper.off('blank:pointerclick');
+			paper.off('cell:pointerdown');
+			$('button').attr('disabled', false);
+			$('#gen_line').attr('disabled', true);
+
+			paper.off('cell:pointerclick');
+			paper.on('cell:pointerdown', function(cellView, event, x, y){
+				console.log('cell:pointerdown');
+				cellView.options.interactive = false;
+
+				paper.on('cell:pointerup', function(cellView2, event, x, y){
+					paper.off('cell:pointerup');
+					//paper.off('cell:pointerdown');
+
+					console.log('cell:pointerup');
+					cellView.options.interactive = true;
+
+					console.log(cellView);
+					cellView2 = paper.findViewsFromPoint({x: x, y: y})[0];
+					var link = new joint.dia.Link({
+						source: { id: cellView.model.id },
+						target: { id: cellView2.model.id }
+					});
+					
+
+					graph.addCell(link);
+				});
+			});
+		});
+
+
+		
+
+		graph.addCells([rect, rect2]);
 
   	</script>
 </body>

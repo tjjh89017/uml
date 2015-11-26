@@ -13,9 +13,10 @@
 	<div id="select-menu">
 		<button id='select' class='button' disabled>Select</button>
 		<button id='create-class' class='button'>Create Class</button>
+		<button id='create-usecase' class='button'>Create Use Case</button>
 		<button id='ass_line' class='button'>association line</button>
 		<button id='gen_line' class='button'>generalization line</button>
-		<button class='button'>e</button>
+		<button id='com_line' class='button'>composition line</button>
 
 	</div>
     <div id="myholder" style="border-style:solid;width:1000px;height:600px"></div>
@@ -52,6 +53,8 @@
 			console.log('create-class onclick');
 			paper.off('cell:pointerdown');
 			paper.off('blank:pointerdown');
+			paper.off('blank:pointerclick');
+
 
 			paper.on('blank:pointerclick', function(event, x1, y1){
 				graph.addCell(new joint.shapes.basic.Rect({
@@ -66,6 +69,25 @@
 			$('#create-class').css('background-color', 'black');
 		});
 
+		$('#create-usecase').click(function(event){
+			console.log('create-usecase onclick');
+			paper.off('cell:pointerdown');
+			paper.off('blank:pointerdown');
+			paper.off('blank:pointerclick');
+
+			paper.on('blank:pointerclick', function(event, x1, y1){
+				graph.addCell(new joint.shapes.basic.Circle({
+					position: {x: x1, y: y1},
+					size: {width: 100, height: 30},
+					attrs: {circle: {fill: 'blue'}, text: {text: 'mybox', fill: 'white'}}
+				}));
+			});
+			$('button').attr('disabled', false);
+			$('button').css('background-color', '');
+			$('#create-usecase').attr('disabled', true);
+			$('#create-usecase').css('background-color', 'black');
+		});
+
 		$('#select').click(function(event){
 			console.log('select onclick');
 			paper.off('blank:pointerclick');
@@ -78,6 +100,9 @@
 
 			paper.on('cell:pointerclick', function(cellView, event, x, y){
 				if(cellView.$el.attr('class').indexOf('highlighted') > -1){
+					graph.get('cells').forEach(function(cell){
+						paper.findViewByModel(cell).unhighlight();
+					});
 					cellView.unhighlight();
 				}
 				else{
@@ -104,6 +129,10 @@
 					console.log(event2);
 					console.log(x2);
 					console.log(y2);
+
+					graph.get('cells').forEach(function(cell){
+						paper.findViewByModel(cell).unhighlight();
+					});
 
 					var s = paper.findViewsInArea({
 						x: x1,
@@ -198,7 +227,46 @@
 			});
 		});
 
+		$('#com_line').click(function(event){
+			console.log('ass_line onclick');
+			paper.off('blank:pointerclick');
+			paper.off('cell:pointerdown');
+			paper.off('blank:pointerdown');
+			$('button').attr('disabled', false);
+			$('button').css('background-color', '');
+			$('#com_line').attr('disabled', true);
+			$('#com_line').css('background-color', 'black');
 
+			paper.off('cell:pointerclick');
+			paper.on('cell:pointerdown', function(cellView, event, x, y){
+				console.log('cell:pointerdown');
+				cellView.options.interactive = false;
+
+				paper.on('cell:pointerup', function(cellView2, event, x, y){
+					paper.off('cell:pointerup');
+					//paper.off('cell:pointerdown');
+
+					console.log('cell:pointerup');
+					cellView.options.interactive = true;
+
+					console.log(cellView);
+					cellView2 = paper.findViewsFromPoint({x: x, y: y})[0];
+					if(cellView2 && cellView != cellView2){
+						var link = new joint.dia.Link({
+							source: { id: cellView.model.id },
+							target: { id: cellView2.model.id }
+						});
+						link.attr({
+							'.marker-target': {
+								fill: 'red', d: 'M 5 0 L 10 5 L 5 10 L 0 5 z'
+							}
+						});
+
+						graph.addCell(link);
+					}
+				});
+			});
+		});
 		
 		$('#select').click();
 		//graph.addCells([rect, rect2]);

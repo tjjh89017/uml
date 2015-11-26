@@ -36,19 +36,22 @@
 			model: graph,
 			gridSize: 1
 		});
-
+		/*
 		var rect = new joint.shapes.basic.Rect({
 			position: { x: 100, y: 30 },
 			size: { width: 100, height: 30 },
 			attrs: { rect: { fill: 'blue' }, text: { text: 'my box', fill: 'white' } }
 		});
+		
 
 		var rect2 = rect.clone();
 		rect2.translate(300);
+		*/
 
 		$('#create-class').click(function(event){
 			console.log('create-class onclick');
 			paper.off('cell:pointerdown');
+			paper.off('blank:pointerdown');
 
 			paper.on('blank:pointerclick', function(event, x1, y1){
 				graph.addCell(new joint.shapes.basic.Rect({
@@ -58,15 +61,20 @@
 				}));
 			});
 			$('button').attr('disabled', false);
-			$('#create-class').attr('disabled', true)
+			$('button').css('background-color', '');
+			$('#create-class').attr('disabled', true);
+			$('#create-class').css('background-color', 'black');
 		});
 
 		$('#select').click(function(event){
 			console.log('select onclick');
 			paper.off('blank:pointerclick');
+			paper.off('cell:pointerclick');
 			paper.off('cell:pointerdown');
 			$('button').attr('disabled', false);
+			$('button').css('background-color', '');
 			$('#select').attr('disabled', true);
+			$('#select').css('background-color', 'black');
 
 			paper.on('cell:pointerclick', function(cellView, event, x, y){
 				if(cellView.$el.attr('class').indexOf('highlighted') > -1){
@@ -78,17 +86,49 @@
 					});
 					cellView.highlight();
 				}
+				console.log('cell:pointerclick');
 				console.log(cellView);
 				console.log(cellView.$el.attr('class'));
 			});
+
+
+			paper.on('blank:pointerdown', function(event1, x1, y1){
+				console.log('blank:pointerdown in select');
+				console.log(event1);
+				console.log(x1);
+				console.log(y1);
+
+				paper.on('blank:pointerup', function(event2, x2, y2){
+					paper.off('blank:pointerup');
+					console.log('up');
+					console.log(event2);
+					console.log(x2);
+					console.log(y2);
+
+					var s = paper.findViewsInArea({
+						x: x1,
+						y: y1,
+						width: x2 - x1,
+						height: y2 - y1
+					});
+					console.log(s);
+					for(var i in s){
+						s[i].highlight();
+					}
+				});
+			});
+
 		});
 
 		$('#ass_line').click(function(event){
 			console.log('ass_line onclick');
 			paper.off('blank:pointerclick');
 			paper.off('cell:pointerdown');
+			paper.off('blank:pointerdown');
 			$('button').attr('disabled', false);
+			$('button').css('background-color', '');
 			$('#ass_line').attr('disabled', true);
+			$('#ass_line').css('background-color', 'black');
 
 			paper.off('cell:pointerclick');
 			paper.on('cell:pointerdown', function(cellView, event, x, y){
@@ -125,8 +165,11 @@
 			console.log('ass_line onclick');
 			paper.off('blank:pointerclick');
 			paper.off('cell:pointerdown');
+			paper.off('blank:pointerdown');
 			$('button').attr('disabled', false);
+			$('button').css('background-color', '');
 			$('#gen_line').attr('disabled', true);
+			$('#gen_line').css('background-color', 'black');
 
 			paper.off('cell:pointerclick');
 			paper.on('cell:pointerdown', function(cellView, event, x, y){
@@ -157,8 +200,8 @@
 
 
 		
-
-		graph.addCells([rect, rect2]);
+		$('#select').click();
+		//graph.addCells([rect, rect2]);
 
   	</script>
 </body>

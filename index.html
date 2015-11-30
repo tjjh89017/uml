@@ -17,6 +17,7 @@
 		<button id='ass_line' class='button'>association line</button>
 		<button id='gen_line' class='button'>generalization line</button>
 		<button id='com_line' class='button'>composition line</button>
+		<button id='edit_text' class='button'>edit text</button>
 
 	</div>
     <div id="myholder" style="border-style:solid;width:1000px;height:600px"></div>
@@ -99,6 +100,10 @@
 			$('#select').css('background-color', 'black');
 
 			paper.on('cell:pointerclick', function(cellView, event, x, y){
+
+				// turn off edit_text
+				$('#edit_text').off('click');
+
 				if(cellView.$el.attr('class').indexOf('highlighted') > -1){
 					graph.get('cells').forEach(function(cell){
 						paper.findViewByModel(cell).unhighlight();
@@ -110,10 +115,18 @@
 						paper.findViewByModel(cell).unhighlight();
 					});
 					cellView.highlight();
+					
+					$('#edit_text').click(function(event){
+						var text = prompt('Edit Text', cellView.model.attr('text/text'));
+						if(text != null){
+							cellView.model.attr('text/text', text);
+						}
+
+					});
 				}
 				console.log('cell:pointerclick');
 				console.log(cellView);
-				console.log(cellView.$el.attr('class'));
+				console.log(cellView.model);
 			});
 
 
@@ -122,6 +135,8 @@
 				console.log(event1);
 				console.log(x1);
 				console.log(y1);
+
+				$('#edit_text').off('click');
 
 				paper.on('blank:pointerup', function(event2, x2, y2){
 					paper.off('blank:pointerup');
@@ -143,6 +158,16 @@
 					console.log(s);
 					for(var i in s){
 						s[i].highlight();
+					}
+
+					if(s.length == 1){
+						var cellView = s[0];
+						$('#edit_text').click(function(event){
+							var text = prompt('Edit Text', cellView.model.attr('text/text'));
+							if(text != null){
+								cellView.model.attr('text/text', text);
+							}
+						});
 					}
 				});
 			});
